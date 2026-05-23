@@ -173,7 +173,7 @@ select {
   border: none;
   outline: none;
   background: transparent;
-  color: #222;
+  color: #999;
   font-size: 14px;
   font-family: inherit;
   appearance: none;
@@ -183,6 +183,23 @@ select {
   background-position: right 4px center;
   padding-right: 20px;
   cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
+  border-radius: 6px;
+  padding: 6px 24px 6px 8px;
+}
+
+/* unselected — placeholder look */
+select.select-empty {
+  color: #aaa;
+  background-color: transparent;
+}
+
+/* selected — green tint */
+select.select-done {
+  color: #166534;
+  background-color: #dcfce7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%23166534' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  font-weight: 600;
 }
 
 select option {
@@ -510,17 +527,90 @@ input[type="range"] {
   .topbar {
     flex-direction: column;
     align-items: flex-start;
-    padding: 20px 24px;
+    padding: 16px 20px;
+    gap: 12px;
   }
 
-  .topbar h1 { font-size: 20px; }
+  .topbar-right {
+    align-items: flex-start;
+  }
+
+  .tags {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .title-main,
+  .title-ai {
+    font-size: 22px;
+  }
 
   .split-card {
     grid-template-columns: 1fr;
-    margin: 20px 16px 32px;
+    margin: 16px 12px 24px;
+    border-radius: 14px;
   }
 
-  .panel { padding: 28px 24px; }
+  .panel {
+    padding: 24px 20px;
+  }
 
-  .bottom-stats { grid-template-columns: 1fr; }
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .field-row .field:first-child {
+    border-right: none;
+    border-bottom: 1.5px solid #d0d0d0;
+    padding-right: 0;
+  }
+
+  .field-row .field:last-child {
+    padding-left: 0;
+  }
+
+  .bottom-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-dark {
+    border-radius: 0 0 14px 14px;
+  }
+
+  .panel-light {
+    border-radius: 14px 14px 0 0;
+  }
+
+  .predict-btn {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .severity-badge {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 14px 16px;
+  }
+
+  .title-main,
+  .title-ai {
+    font-size: 20px;
+  }
+
+  .split-card {
+    margin: 12px 8px 20px;
+  }
+
+  .panel {
+    padding: 20px 16px;
+  }
+
+  .tags span {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
 }

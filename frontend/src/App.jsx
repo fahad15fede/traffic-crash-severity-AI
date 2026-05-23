@@ -1,7 +1,7 @@
 import "./App.css";
 import { useState } from "react";
 
-const API = "http://localhost:8000";
+const API = import.meta.env.VITE_API_URL || "https://fede8rma-carcrashai.hf.space";
 
 // ── Severity tips ────────────────────────────────────────────────────────────
 const TIPS = {
@@ -104,6 +104,9 @@ export default function App() {
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
+  // returns className for a select based on whether it has a value
+  const sel = (key) => form[key] ? "select-done" : "select-empty";
+
   const handlePredict = async () => {
     // basic validation
     const required = [
@@ -173,7 +176,7 @@ export default function App() {
           <div className="field-group">
 
             <div className="field">
-              <select value={form.weather_condition} onChange={e => set("weather_condition", e.target.value)}>
+              <select className={sel("weather_condition")} value={form.weather_condition} onChange={e => set("weather_condition", e.target.value)}>
                 <option value="" disabled>Weather</option>
                 <option value="CLEAR">Clear</option>
                 <option value="RAIN">Rain</option>
@@ -184,7 +187,7 @@ export default function App() {
 
             <div className="field-row">
               <div className="field">
-                <select value={form.lighting_condition} onChange={e => set("lighting_condition", e.target.value)}>
+                <select className={sel("lighting_condition")} value={form.lighting_condition} onChange={e => set("lighting_condition", e.target.value)}>
                   <option value="" disabled>Lighting</option>
                   <option value="DAYLIGHT">Daylight</option>
                   <option value="DARKNESS">Darkness</option>
@@ -193,7 +196,7 @@ export default function App() {
                 </select>
               </div>
               <div className="field">
-                <select value={form.roadway_surface_cond} onChange={e => set("roadway_surface_cond", e.target.value)}>
+                <select className={sel("roadway_surface_cond")} value={form.roadway_surface_cond} onChange={e => set("roadway_surface_cond", e.target.value)}>
                   <option value="" disabled>Surface</option>
                   <option value="DRY">Dry</option>
                   <option value="WET">Wet</option>
@@ -204,7 +207,7 @@ export default function App() {
             </div>
 
             <div className="field">
-              <select value={form.road_defect} onChange={e => set("road_defect", e.target.value)}>
+              <select className={sel("road_defect")} value={form.road_defect} onChange={e => set("road_defect", e.target.value)}>
                 <option value="" disabled>Road Defect</option>
                 <option value="NO DEFECTS">No Defects</option>
                 <option value="RUT, HOLES">Ruts / Holes</option>
@@ -215,7 +218,7 @@ export default function App() {
 
             <div className="field-row">
               <div className="field">
-                <select value={form.traffic_control_device} onChange={e => set("traffic_control_device", e.target.value)}>
+                <select className={sel("traffic_control_device")} value={form.traffic_control_device} onChange={e => set("traffic_control_device", e.target.value)}>
                   <option value="" disabled>Traffic Control</option>
                   <option value="TRAFFIC SIGNAL">Traffic Signal</option>
                   <option value="STOP SIGN/FLASHER">Stop Sign</option>
@@ -224,7 +227,7 @@ export default function App() {
                 </select>
               </div>
               <div className="field">
-                <select value={form.alignment} onChange={e => set("alignment", e.target.value)}>
+                <select className={sel("alignment")} value={form.alignment} onChange={e => set("alignment", e.target.value)}>
                   <option value="" disabled>Road Alignment</option>
                   <option value="STRAIGHT AND LEVEL">Straight &amp; Level</option>
                   <option value="STRAIGHT ON GRADE">Straight on Grade</option>
@@ -235,7 +238,7 @@ export default function App() {
             </div>
 
             <div className="field">
-              <select value={form.trafficway_type} onChange={e => set("trafficway_type", e.target.value)}>
+              <select className={sel("trafficway_type")} value={form.trafficway_type} onChange={e => set("trafficway_type", e.target.value)}>
                 <option value="" disabled>Trafficway Type</option>
                 <option value="DIVIDED - W/MEDIAN BARRIER">Divided w/ Barrier</option>
                 <option value="NOT DIVIDED">Not Divided</option>
@@ -245,7 +248,7 @@ export default function App() {
             </div>
 
             <div className="field">
-              <select value={form.first_crash_type} onChange={e => set("first_crash_type", e.target.value)}>
+              <select className={sel("first_crash_type")} value={form.first_crash_type} onChange={e => set("first_crash_type", e.target.value)}>
                 <option value="" disabled>First Crash Type</option>
                 <option value="REAR END">Rear End</option>
                 <option value="TURNING">Turning</option>
@@ -259,7 +262,7 @@ export default function App() {
             </div>
 
             <div className="field">
-              <select value={form.prim_contributory_cause} onChange={e => set("prim_contributory_cause", e.target.value)}>
+              <select className={sel("prim_contributory_cause")} value={form.prim_contributory_cause} onChange={e => set("prim_contributory_cause", e.target.value)}>
                 <option value="" disabled>Primary Cause</option>
                 <option value="FAILING TO YIELD RIGHT-OF-WAY">Failing to Yield</option>
                 <option value="FOLLOWING TOO CLOSELY">Following Too Closely</option>
@@ -275,7 +278,7 @@ export default function App() {
 
             <div className="field-row">
               <div className="field">
-                <select value={form.damage} onChange={e => set("damage", e.target.value)}>
+                <select className={sel("damage")} value={form.damage} onChange={e => set("damage", e.target.value)}>
                   <option value="" disabled>Damage</option>
                   <option value="OVER $1,500">Over $1,500</option>
                   <option value="$501 - $1,500">$501 – $1,500</option>
