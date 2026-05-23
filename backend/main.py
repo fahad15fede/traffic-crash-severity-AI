@@ -1,28 +1,24 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-
-
+import joblib
 import pandas as pd
-import pickle
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-
     allow_origins=[
-        "http://localhost:5173"
+        "http://localhost:5173",
+        "https://*.vercel.app",
     ],
-
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 #Load model
-with open("model_rf_new.pkl", "rb") as f1:
-    model1 = pickle.load(f1)
+model1 = joblib.load("model_final_rf.pkl")
 
 #Input Schema
 class AccidentInput(BaseModel):
