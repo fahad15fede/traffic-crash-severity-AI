@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import joblib
@@ -17,10 +17,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#Load model
-model1 = joblib.load("model_final_rf.pkl")
+# Load models
+model1 = joblib.load("model_final_rf.pkl")           # Model 1 — RF (token-gated)
+model2 = joblib.load("model_final_xgboost1.pkl")     # Model 2 — XGBoost (unlimited)
 
-#Input Schema
+# Input Schema
 class AccidentInput(BaseModel):
     weather_condition: str
     lighting_condition: str
@@ -33,40 +34,41 @@ class AccidentInput(BaseModel):
     first_crash_type: str
     prim_contributory_cause: str
     damage: str
-
     num_units: int
     crash_hour: int
     crash_day_of_week: int
     crash_month: int
+    model: int = 2  # 1 or 2
 
 @app.get("/")
 def home():
-    return{"message: Accident Severity Prediction API"}
+    return {"message": "Traffic Crashes.AI Prediction API"}
 
 @app.post("/predict")
 def predict(data: AccidentInput):
-
     input_df = pd.DataFrame([{
-        "weather_condition":      data.weather_condition,
-        "lighting_condition":     data.lighting_condition,
-        "roadway_surface_cond":   data.roadway_surface_cond,
-        "road_defect":            data.road_defect,
-        "traffic_control_device": data.traffic_control_device,
-        "trafficway_type":        data.trafficway_type,
-        "alignment":              data.alignment,
-        "intersection_related_i": data.intersection_related_i,
-        "first_crash_type":       data.first_crash_type,
-        "prim_contributory_cause":data.prim_contributory_cause,
-        "damage":                 data.damage,
-        "num_units":              data.num_units,
-        "crash_hour":             data.crash_hour,
-        "crash_day_of_week":      data.crash_day_of_week,
-        "crash_month":            data.crash_month,
+        "weather_condition":       data.weather_condition,
+        "lighting_condition":      data.lighting_condition,
+        "roadway_surface_cond":    data.roadway_surface_cond,
+        "road_defect":             data.road_defect,
+        "traffic_control_device":  data.traffic_control_device,
+        "trafficway_type":         data.trafficway_type,
+        "alignment":               data.alignment,
+        "intersection_related_i":  data.intersection_related_i,
+        "first_crash_type":        data.first_crash_type,
+        "prim_contributory_cause": data.prim_contributory_cause,
+        "damage":                  data.damage,
+        "num_units":               data.num_units,
+        "crash_hour":              data.crash_hour,
+        "crash_day_of_week":       data.crash_day_of_week,
+        "crash_month":             data.crash_month,
     }])
 
-    prediction = model1.predict(input_df)[0]
-    probabilities = model1.predict_proba(input_df)[0]
-    classes = model1.classes_
+    model = model1 if data.model == 1 else model2
+
+    prediction   = model.predict(input_df)[0]
+    probabilities = model.predict_proba(input_df)[0]
+    classes      = model.classes_
 
     confidence = {
         str(cls): round(float(prob) * 100, 1)
@@ -75,5 +77,6 @@ def predict(data: AccidentInput):
 
     return {
         "predicted_severity": str(prediction),
-        "confidence": confidence
+        "confidence": confidence,
+        "model_used": data.model,
     }

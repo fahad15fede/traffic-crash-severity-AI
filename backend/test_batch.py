@@ -23,7 +23,6 @@ def case(name, expected, **kw):
     }
     defaults.update(kw)
     return {"name": name, "expected": expected, "payload": defaults}
-
 tests = [
     case("1. Clear Safe Driving",      "NO_INJURY",
          trafficway_type="ONE-WAY", crash_hour=11, crash_day_of_week=2, crash_month=6),
@@ -301,30 +300,40 @@ tests = [
          crash_hour=16, crash_day_of_week=6, crash_month=6),
 ]
 
-passed = failed = 0
+def run_tests(model_id):
+    passed = failed = 0
+    print(f"\n{'='*60}")
+    print(f"  MODEL {model_id} — {len(tests)} cases")
+    print(f"{'='*60}\n")
+
+    for t in tests:
+        payload = {**t["payload"], "model": model_id}
+        try:
+            r = requests.post(API, json=payload, timeout=10)
+            r.raise_for_status()
+            got  = r.json().get("predicted_severity", "N/A")
+            conf = r.json().get("confidence", {})
+            ok   = got == t["expected"]
+            status = "PASS ✓" if ok else "FAIL ✗"
+            passed += ok; failed += not ok
+            print(f"[{status}]  {t['name']}")
+            if not ok:
+                print(f"         expected: {t['expected']}  |  got: {got}")
+            conf_str = "  ".join(f"{k}: {v}%" for k, v in conf.items())
+            print(f"         {conf_str}")
+        except Exception as e:
+            failed += 1
+            print(f"[ERROR]  {t['name']}  →  {e}")
+
+    print(f"\n  Results: {passed} passed, {failed} failed out of {len(tests)}")
+    print(f"{'='*60}\n")
+    return passed, failed
+
+p1, f1 = run_tests(model_id=1)
+p2, f2 = run_tests(model_id=2)
 
 print(f"\n{'='*60}")
-print(f"  BATCH TEST — {len(tests)} cases")
-print(f"{'='*60}\n")
-
-for t in tests:
-    try:
-        r = requests.post(API, json=t["payload"], timeout=5)
-        r.raise_for_status()
-        got = r.json().get("predicted_severity", "N/A")
-        conf = r.json().get("confidence", {})
-        ok = got == t["expected"]
-        status = "PASS ✓" if ok else "FAIL ✗"
-        passed += ok; failed += not ok
-        print(f"[{status}]  {t['name']}")
-        if not ok:
-            print(f"         expected: {t['expected']}  |  got: {got}")
-        conf_str = "  ".join(f"{k}: {v}%" for k, v in conf.items())
-        print(f"         {conf_str}")
-    except Exception as e:
-        failed += 1
-        print(f"[ERROR]  {t['name']}  →  {e}")
-
-print(f"\n{'='*60}")
-print(f"  Results: {passed} passed, {failed} failed out of {len(tests)}")
+print(f"  SUMMARY")
+print(f"  Model 1 (RF):      {p1}/{len(tests)} passed")
+print(f"  Model 2 (XGBoost): {p2}/{len(tests)} passed")
 print(f"{'='*60}\n")

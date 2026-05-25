@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir -r requirements_hf.txt
 
 COPY main.py .
 COPY model_final_rf.pkl .
+COPY model_final_xgboost1.pkl .
 
 EXPOSE 7860
 

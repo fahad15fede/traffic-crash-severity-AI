@@ -138,13 +138,8 @@ y_true = [c["y"] for c in cases]
 
 # ── Models to test ───────────────────────────────────────────────────────────
 MODEL_FILES = [
-    "model3.pkl",
-    "model4.pkl",
-    "model_rf3_smote.pkl",
-    "model_rf4.pkl",
-    "model_knn_smote.pkl",
-    "model_svm_smote.pkl",
-    "model_svm.pkl",
+    "model_final_rf.pkl",        # Model 1 — Random Forest
+    "model_final_xgboost1.pkl",  # Model 2 — XGBoost
 ]
 
 # ── Run ──────────────────────────────────────────────────────────────────────
