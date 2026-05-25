@@ -2,12 +2,24 @@ import { useState } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function AuthModal({ onClose, onSuccess }) {
-  const [mode, setMode] = useState("login"); // "login" | "signup"
+  const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [closing, setClosing] = useState(false);
+
+  const close = () => {
+    setClosing(true);
+    setTimeout(onClose, 220);
+  };
+
+  const switchMode = () => {
+    setMode(m => m === "login" ? "signup" : "login");
+    setError(null);
+    setConfirm("");
+  };
 
   const handle = async (e) => {
     e.preventDefault();
@@ -23,8 +35,6 @@ export default function AuthModal({ onClose, onSuccess }) {
     if (mode === "signup") {
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) { setError(error.message); setLoading(false); return; }
-
-      // create profile row
       await supabase.from("profiles").insert({ id: data.user.id, email: data.user.email });
       onSuccess(data.user);
     } else {
@@ -37,9 +47,10 @@ export default function AuthModal({ onClose, onSuccess }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-card" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>✕</button>
+    <div className={`modal-overlay ${closing ? "modal-out" : "modal-in"}`} onClick={close}>
+      <div className={`modal-card ${closing ? "card-out" : "card-in"}`} onClick={e => e.stopPropagation()}>
+
+        <button className="modal-close" onClick={close}>✕</button>
 
         <h2 className="modal-title">
           {mode === "login" ? "Sign in" : "Create account"}
@@ -85,7 +96,7 @@ export default function AuthModal({ onClose, onSuccess }) {
 
         <p className="modal-switch">
           {mode === "login" ? "No account? " : "Already have one? "}
-          <button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); setConfirm(""); }}>
+          <button onClick={switchMode}>
             {mode === "login" ? "Sign up" : "Sign in"}
           </button>
         </p>
