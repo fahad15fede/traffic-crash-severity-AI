@@ -66,17 +66,28 @@ def predict(data: AccidentInput):
 
     model = model1 if data.model == 1 else model2
 
-    prediction   = model.predict(input_df)[0]
+    prediction    = model.predict(input_df)[0]
     probabilities = model.predict_proba(input_df)[0]
-    classes      = model.classes_
+    classes       = model.classes_
+
+    # Map numeric labels (XGBoost returns 0/1/2) to string labels
+    LABEL_MAP = {0: "NO_INJURY", 1: "MINOR", 2: "SEVERE"}
+
+    def to_label(v):
+        # handle int, numpy int, float, or string representation ("0", "1.0", "NO_INJURY")
+        try:
+            val_int = int(float(v))
+            return LABEL_MAP.get(val_int, str(v))
+        except (ValueError, TypeError):
+            return str(v)
 
     confidence = {
-        str(cls): round(float(prob) * 100, 1)
+        to_label(cls): round(float(prob) * 100, 1)
         for cls, prob in zip(classes, probabilities)
     }
 
     return {
-        "predicted_severity": str(prediction),
+        "predicted_severity": to_label(prediction),
         "confidence": confidence,
         "model_used": data.model,
     }

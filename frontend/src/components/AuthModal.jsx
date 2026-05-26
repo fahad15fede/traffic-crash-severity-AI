@@ -57,8 +57,8 @@ export default function AuthModal({ onClose, onSuccess }) {
         </h2>
         <p className="modal-sub">
           {mode === "login"
-            ? "Sign in to access Model 2 — XGBoost (unlimited predictions)."
-            : "Free account. Unlock Model 2 and save your prediction history."}
+            ? "Sign in to access Nexus — 10 tokens per account."
+            : "Free account. Get 10 Nexus tokens and save your prediction history."}
         </p>
 
         <form onSubmit={handle} className="modal-form">
