@@ -1,149 +1,191 @@
-# 🚗 Traffic Crashes.AI
+# Traffic Crashes.AI
 
-[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
-[![FastAPI](https://img.shields.io/badge/fastapi-109989?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![XGBoost](https://img.shields.io/badge/xgboost-2C8EAD?style=for-the-badge&logo=scikitlearn&logoColor=white)](https://xgboost.readthedocs.io/)
-[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
-[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-
-An advanced, full-stack machine learning web application that predicts **traffic accident injury severity** based on real-time environmental, roadway, and collision factors. Built with a production-ready **React + Vite** frontend, a scalable **FastAPI** backend (hosted on Hugging Face Spaces Docker), and **Supabase** for secure user authentication and PostgreSQL-backed state persistence.
+A full-stack ML web app that predicts traffic accident injury severity based on environmental, road, and crash conditions. Built with React + Vite on the frontend, FastAPI on the backend (hosted on Hugging Face Spaces), and Supabase for auth and database.
 
 ---
 
-## 🌟 Live Architecture
+## Live
 
-| Service | Role | URL / Technology |
-|:---|:---|:---|
-| **Frontend UI** | Premium Client Application | Hosted on Vercel |
-| **Backend API** | FastAPI Predictor & Middleware | [Hugging Face Spaces](https://fede8rma-carcrashai.hf.space) |
-| **Auth & DB** | PostgreSQL & Secure Sessions | [Supabase Database](https://tjyxnhzuvygcmthesuov.supabase.co) |
-
----
-
-## 🎨 Premium UI & Styling System
-
-The user interface has been redesigned to align with premium, high-fidelity design aesthetics, incorporating:
-- **Outlined Floating-Label Selects**: Input boxes feature sharp, subtle borders. When a field is unselected, the label floats vertically in the center as a placeholder. When focused or when a value is selected, the label transitions smoothly up onto the top-left border line, maintaining 100% legibility and structural beauty.
-- **Unified Custom Controls**: Stepper inputs ("Vehicles Involved"), range sliders ("Crash Hour"), and toggle switches ("Intersection involved?") are wrapped in matching custom outlined field cards, with static labels sitting cleanly on the borders.
-- **Responsive Layout**: Designed with a dynamic 2-column grid layout for desktop viewports that seamlessly collapses into a single-column stacked layout (`gap: 20px`) on mobile devices, ensuring fluid responsiveness and visual consistency.
+| Service | URL |
+|---|---|
+| Frontend | Vercel (your deployment URL) |
+| Backend API | https://fede8rma-carcrashai.hf.space |
+| Supabase | https://tjyxnhzuvygcmthesuov.supabase.co |
 
 ---
 
-## ⚙️ Robust Predictions & Normalization Layer
-
-The platform is designed to handle heterogenous model classes gracefully:
-1. **Model 1 (Pulse - Random Forest)**: Returns string-based class predictions directly (`'NO_INJURY'`, `'MINOR'`, `'SEVERE'`).
-2. **Model 2 (Nexus - XGBoost)**: Predicts numeric classes (`[0, 1, 2]`) which may occasionally be formatted as string-floats (e.g. `'1.0'`, `'2.0'`) depending on serialisation engines.
-
-### Unified Resiliency Engine
-- **Backend Level (`backend/main.py`)**: Features a robust `to_label` conversion routine that converts float-formatted string representations to integers safely before resolving labels:
-  ```python
-  def to_label(v):
-      try:
-          val_int = int(float(v))
-          return LABEL_MAP.get(val_int, str(v))
-      except (ValueError, TypeError):
-          return str(v)
-  ```
-- **Frontend Normalization Layer (`App.jsx`)**: Standardizes all response keys on the client side using a lookup dictionary. This ensures that even if the deployed API changes versions, the frontend will map predictions and confidence statistics to standard uppercase keys (`NO_INJURY`, `MINOR`, `SEVERE`) seamlessly:
-  ```javascript
-  const FRONTEND_LABEL_MAP = {
-    "0": "NO_INJURY",
-    "1": "MINOR",
-    "2": "SEVERE",
-    "NO_INJURY": "NO_INJURY",
-    "MINOR": "MINOR",
-    "SEVERE": "SEVERE",
-  };
-  ```
-
----
-
-## 📂 Project Structure
+## Project Structure
 
 ```
 carCrashFata/
 ├── backend/
-│   ├── main.py                   # FastAPI prediction server
-│   ├── model_final_rf.pkl        # Model 1 — Random Forest (Pulse)
-│   ├── model_final_xgboost1.pkl  # Model 2 — XGBoost (Nexus)
-│   ├── requirements.txt          # Python virtual env dependencies
-│   ├── requirements_hf.txt       # Hugging Face deployment dependencies
-│   ├── Dockerfile                # Production Docker container definition
-│   ├── test_batch.py             # Integration batch tests for both models
-│   └── test_models.py            # Local pickle direct validation (100 cases)
+│   ├── main.py                   # FastAPI app
+│   ├── model_final_rf.pkl        # Model 1 — Random Forest
+│   ├── model_final_xgboost1.pkl  # Model 2 — XGBoost
+│   ├── requirements_hf.txt       # HF Space dependencies
+│   ├── Dockerfile                # HF Space Docker config
+│   ├── test_batch.py             # Live API batch test (both models)
+│   └── test_models.py            # Direct pkl evaluation (100 cases)
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx               # React main app (form, results, auth integration)
-│   │   ├── App.css               # Outlined floating-label design system
-│   │   ├── index.css             # Base reset and modern font import
+│   │   ├── App.jsx               # Main app + form + results
+│   │   ├── App.css               # Styling
 │   │   ├── components/
-│   │   │   └── AuthModal.jsx     # Supabase login & signup dialog
+│   │   │   └── AuthModal.jsx     # Login / signup modal
 │   │   └── lib/
-│   │       └── supabase.js       # Client wrapper for Supabase JS API
-│   ├── .env                      # Local client credentials (git-ignored)
-│   └── package.json              # React project definition
-├── AUTH_DB_PLAN.md               # Backend auth integration design notes
-└── README.md                     # Main project showcase document
+│   │       └── supabase.js       # Supabase client
+│   ├── .env                      # Vite env vars (not committed)
+│   └── package.json
+├── AUTH_DB_PLAN.md               # Auth + database implementation plan
+└── README.md
 ```
 
 ---
 
-## 🛠️ Features
+## Features
 
-- **Multi-Model Inference**: Switch seamlessly between the lightweight **Pulse** model (Random Forest, unlimited free usage) and the heavy-duty **Nexus** model (XGBoost, requires sign-in).
-- **Explainable AI (XAI)**:
-  - Extracts the top risk factor (e.g. adverse weather, curved road, high-impact crash types) dynamically based on user inputs.
-  - Dynamically renders tailored, actionable safety tips matching the predicted injury severity and risk factors.
-  - Live interactive bar charts of the top active risk weights.
-- **Confidence Distribution**: Renders a standard-compliant, color-coded conic gradient pie chart illustrating the model's confidence across classes.
-- **Token-Gated Authentication**:
-  - Unauthenticated guests receive 3 free trial tokens for the high-end **Nexus** model.
-  - Signing up via Supabase awards the user 10 permanent tokens, stored in a PostgreSQL `profiles` table.
-- **Secure Architecture**: Session state is persistent and synced via the Supabase client.
+- Predicts one of three severity classes: `NO_INJURY`, `MINOR`, `SEVERE`
+- Per-class confidence percentages via `predict_proba`
+- Two models selectable in the UI:
+  - **Model 1 — Random Forest**: available to all users, no login required
+  - **Model 2 — XGBoost**: requires sign in (unlimited predictions)
+- Dynamic safety tips driven by the top risk factor detected in the inputs
+- Live risk factor analysis with weighted bars
+- Confidence pie chart (shown after prediction)
+- Supabase auth — email/password signup and login
+- User profiles with `model1_tokens` tracked in Postgres
+- Prediction history stored in `predictions` table
 
 ---
 
-## 🚀 Getting Started
+## Tech Stack
 
-### Prerequisites
-- Python 3.9+
-- Node.js 16+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, Vite |
+| Backend | FastAPI, Uvicorn |
+| ML Models | scikit-learn Random Forest, XGBoost |
+| Auth + DB | Supabase (Postgres + Auth) |
+| Hosting | Vercel (frontend), Hugging Face Spaces (backend) |
+| Containerisation | Docker |
 
-### 1. Run the FastAPI Backend
+---
+
+## Getting Started
+
+### Backend
+
 ```bash
 cd backend
 python -m venv venv
+venv\Scripts\activate        # Windows
+source venv/bin/activate     # macOS/Linux
 
-# Windows
-venv\Scripts\activate
-# macOS/Linux
-source venv/bin/activate
+pip install fastapi uvicorn pandas scikit-learn imbalanced-learn xgboost joblib
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Run server
 uvicorn main:app --reload
 ```
-The API server will launch at `http://127.0.0.1:8000`.
 
-### 2. Run the React Frontend
+API runs at `http://localhost:8000`
+
+### Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The application will launch at `http://localhost:5173`.
+
+App runs at `http://localhost:5173`
 
 ---
 
-## 📧 Database Schema (PostgreSQL)
+## Environment Variables
 
-Set up these tables in your Supabase SQL editor:
+### `frontend/.env`
+```
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...
+VITE_API_URL=https://fede8rma-carcrashai.hf.space
+```
+
+### `backend/.env`
+```
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_KEY=sb_secret_...
+SUPABASE_JWKS_URL=https://your-project.supabase.co/auth/v1/.well-known/jwks.json
+```
+
+---
+
+## API
+
+### `POST /predict`
+
+**Request body:**
+```json
+{
+  "weather_condition": "RAIN",
+  "lighting_condition": "DARKNESS",
+  "roadway_surface_cond": "WET",
+  "road_defect": "NO DEFECTS",
+  "traffic_control_device": "TRAFFIC SIGNAL",
+  "trafficway_type": "NOT DIVIDED",
+  "alignment": "STRAIGHT AND LEVEL",
+  "intersection_related_i": "Y",
+  "first_crash_type": "ANGLE",
+  "prim_contributory_cause": "FAILING TO YIELD RIGHT-OF-WAY",
+  "damage": "OVER $1,500",
+  "num_units": 2,
+  "crash_hour": 22,
+  "crash_day_of_week": 6,
+  "crash_month": 11,
+  "model": 2
+}
+```
+
+**Response:**
+```json
+{
+  "predicted_severity": "MINOR",
+  "confidence": {
+    "MINOR": 61.3,
+    "NO_INJURY": 28.4,
+    "SEVERE": 10.3
+  },
+  "model_used": 2
+}
+```
+
+---
+
+## Input Fields
+
+| Field | Type | Example values |
+|---|---|---|
+| `weather_condition` | string | `CLEAR`, `RAIN`, `SNOW`, `FOG/SMOKE/HAZE` |
+| `lighting_condition` | string | `DAYLIGHT`, `DARKNESS`, `DUSK`, `DAWN` |
+| `roadway_surface_cond` | string | `DRY`, `WET`, `SNOW OR SLUSH`, `ICE` |
+| `road_defect` | string | `NO DEFECTS`, `RUT, HOLES`, `CONSTRUCTION` |
+| `traffic_control_device` | string | `TRAFFIC SIGNAL`, `STOP SIGN/FLASHER`, `NO CONTROLS` |
+| `trafficway_type` | string | `NOT DIVIDED`, `ONE-WAY`, `DIVIDED - W/MEDIAN BARRIER` |
+| `alignment` | string | `STRAIGHT AND LEVEL`, `CURVE ON GRADE` |
+| `intersection_related_i` | string | `Y` or `N` |
+| `first_crash_type` | string | `REAR END`, `ANGLE`, `FIXED OBJECT`, `HEAD ON` |
+| `prim_contributory_cause` | string | `FAILING TO YIELD RIGHT-OF-WAY`, `WEATHER` |
+| `damage` | string | `OVER $1,500`, `$501 - $1,500`, `$500 OR LESS` |
+| `num_units` | int | `1` – `10` |
+| `crash_hour` | int | `0` – `23` |
+| `crash_day_of_week` | int | `1` (Sun) – `7` (Sat) |
+| `crash_month` | int | `1` – `12` |
+| `model` | int | `1` (RF) or `2` (XGBoost) |
+
+---
+
+## Database Schema (Supabase)
 
 ```sql
--- User profiles (automatically synced via PostgreSQL triggers on auth.users)
+-- User profiles (auto-linked to auth.users)
 create table profiles (
   id              uuid primary key references auth.users(id) on delete cascade,
   email           text,
@@ -165,54 +207,58 @@ create table predictions (
 
 ---
 
-## 🧪 Testing Suite
+## Auth Flow
 
-### Direct Pickle Validation
-Directly evaluates the `.pkl` files locally over 100 mock cases without running the API server:
-```bash
-cd backend
-python test_models.py
-```
-Outputs classification reports, F1-scores, and ranks the models by prediction accuracy.
-
-### Live API Batch Test
-Tests the live FastAPI server across 40 labelled scenarios:
-```bash
-cd backend
-python test_batch.py
-```
+- **Model 1 (RF)** — available to all visitors, no login required
+- **Model 2 (XGBoost)** — clicking it prompts login/signup if not authenticated
+- After 5 Model 1 uses, a nudge appears suggesting sign-in for Model 2
+- Signup creates a user in Supabase Auth and a profile row with 10 Model 1 tokens
+- Sessions are persisted automatically by the Supabase JS client
 
 ---
 
-## 🎨 UI Branding & Styling Reference
+## Testing
 
-| Token Name | Hex Code | Purpose |
-|:---|:---|:---|
-| **Deep Space** | `#0d0d0d` | Core app canvas background |
-| **Steel Blue** | `#34435E` | Sidebar card panels, high-contrast text |
-| **Amber Gold** | `#FFC857` | Active borders, badges, premium headings |
-| **Vivid Violet**| `#7C3AED` | Brand `.AI` accent, focused form outlines |
-| **Safe Green** | `#22c55e` | `.no_injury` severity theme |
-| **Warning Amber**| `#eab308` | `.minor` severity theme |
-| **Danger Red** | `#ef4444` | `.severe` severity theme |
-| **Warm Canvas**| `#f5f5f5` | Form background card |
+### Batch API test (requires backend running)
+```bash
+cd backend
+venv\Scripts\python test_batch.py
+```
+Tests both models across 40 labelled cases, reports pass/fail and confidence per prediction.
+
+### Direct model evaluation
+```bash
+cd backend
+venv\Scripts\python test_models.py
+```
+Loads `model_final_rf.pkl` and `model_final_xgboost1.pkl` directly, runs 100 cases, prints accuracy, weighted F1, and classification report for each — ranked by F1.
 
 ---
 
-## 📦 Deployment Instructions
+## Deployment
 
-### Frontend (Vercel)
-1. Link your GitHub repository to Vercel.
-2. Set the root directory to `frontend`.
-3. Inject client environment variables:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_API_URL` (Points to the FastAPI server)
+### Frontend → Vercel
+1. Push repo to GitHub
+2. Import in Vercel, set root to `frontend`
+3. Add env vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_API_URL`
 
-### Backend (Hugging Face Spaces)
-1. Create a Hugging Face Space using the **Docker SDK**.
-2. Push all code under the `backend/` directory (including the `.pkl` models and `Dockerfile`).
-3. Set your Space's environment variables / secrets:
-   - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_KEY`
-   - `SUPABASE_JWKS_URL`
+### Backend → Hugging Face Spaces
+1. Create a new Space (Docker SDK)
+2. Push `backend/` contents including both `.pkl` files
+3. Add secrets: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `SUPABASE_JWKS_URL`
+4. Space builds from `Dockerfile` and exposes port `7860`
+
+---
+
+## UI Color Palette
+
+| Color | Hex | Usage |
+|---|---|---|
+| Black | `#000000` | Topbar background |
+| Navy | `#34435E` | Results panel, cards |
+| Amber | `#FFC857` | Accents, button, headings |
+| Violet | `#7C3AED` | `.AI` brand accent |
+| Green | `#22c55e` | No injury severity |
+| Yellow | `#eab308` | Minor severity |
+| Red | `#ef4444` | Severe / danger |
+| Off-white | `#f5f5f5` | Input panel background |
